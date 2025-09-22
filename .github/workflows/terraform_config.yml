@@ -1,4 +1,4 @@
-name: Terraform Deploy - Dev
+name: TerraformConfigration
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: environments
+        working-directory: ${{ github.workspace }}/{{ github.event.inputs.environment }}
 
 
     steps:
@@ -35,7 +35,8 @@ jobs:
       run: terraform init
 
     - name: Terraform Plan
-      run: terraform plan -var="admin_username=${{ secrets.TF_ADMIN_USERNAME }}" -var="admin_password=${{ secrets.TF_ADMIN_PASSWORD }}"
+      run: terraform plan -var-file="{{ github.event.inputs.environment }}.tfvars" -var="admin_username=${{ secrets.TF_ADMIN_USERNAME }}" -var="admin_password=${{ secrets.TF_ADMIN_PASSWORD }}"
+
 
     - name: Terraform Apply
-      run: terraform apply -auto-approve -var="admin_username=${{ secrets.TF_ADMIN_USERNAME }}" -var="admin_password=${{ secrets.TF_ADMIN_PASSWORD }}"
+      run: terraform apply -auto-approve -var-file="{{ github.event.inputs.environment }}.tfvars" -var="admin_username=${{ secrets.TF_ADMIN_USERNAME }}" -var="admin_password=${{ secrets.TF_ADMIN_PASSWORD }}"
